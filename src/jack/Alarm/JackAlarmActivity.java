@@ -32,6 +32,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 public class JackAlarmActivity extends Activity implements OnInitListener, OnUtteranceCompletedListener{
@@ -115,8 +116,6 @@ public class JackAlarmActivity extends Activity implements OnInitListener, OnUtt
     public void onResume(){
         Log.d(tag, "onResume");
         super.onResume();
-        String intentAction = getIntent().getAction();
-
     }
 
     public void onNewIntent(Intent intent){
@@ -128,6 +127,7 @@ public class JackAlarmActivity extends Activity implements OnInitListener, OnUtt
 
     private void setAlarm(){
         Log.d(tag, "setting the alarms to go off");
+        //Toast.makeText(this, R.string.alarm_set_toast_title, Toast.LENGTH_LONG).show();
         ArrayList<Integer> armedDays = alarmedDays(); //returns 1-7 for sunday through saturday
         if(armedDays.isEmpty()){
             Log.d(tag, "no checked days");
@@ -190,6 +190,7 @@ public class JackAlarmActivity extends Activity implements OnInitListener, OnUtt
 
     public void unSetAlarm(){
         Log.d(tag, "unsetting the alarm, should remove all intents, and never go off");
+       //Toast.makeText(this, R.string.alarm_unset_toast_title, Toast.LENGTH_SHORT).show();
         mAlarmManager.cancel(createAlarmPendingIntent());
     }
 
@@ -224,7 +225,9 @@ public class JackAlarmActivity extends Activity implements OnInitListener, OnUtt
             return new TimePickerDialog(this, mAlarmTimePickedListener, now.getHours(), now.getMinutes(), false);
         case ALARM_NOW_ID:
             alarmProgressCancelListener listener = new alarmProgressCancelListener(this);
-            alarmProgressDialog = ProgressDialog.show(this, "Title", "message", true, true, listener);
+            alarmProgressDialog = new ProgressDialog(this, ProgressDialog.STYLE_SPINNER);
+            alarmProgressDialog.setOnCancelListener(listener);
+            alarmProgressDialog.setMessage("Alarm now");
             return alarmProgressDialog;
         default:
             Log.d(tag, "uhoh, got a bad ID in onCreateDialog, don't have a proper dialog to create :(");
@@ -236,11 +239,6 @@ public class JackAlarmActivity extends Activity implements OnInitListener, OnUtt
     public void onInit(int status) {
         Log.d(tag, "onInit");
         mTts.setLanguage(Locale.US);
-//        Intent intent = getIntent();
-//        String action = intent.getAction();
-//        if(action.equals(intent_alarm_action)){
-//            startAlarming();
-//        }
 
     }
 

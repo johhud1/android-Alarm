@@ -13,5 +13,7 @@
     <string name="alarmToggle_text">Alarm</string>
     <string name="sunday_cb_text">Sunday</string>
     <string name="ALARM_EXECUTE_INTENT">ACTION_EXECUTE_ALARM</string>
+    <string name="alarm_set_toast_title">Alarm Now Set</string>
+    <string name="alarm_unset_toast_title">Alarm Now Off</string>
 
 </resources>
