@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, JackAlarmActivity!</string>
+    <string name="app_name">JackAlarm</string>
+    <string name="monday_cb_text">Monday</string>
+    <string name="tuesday_cb_text">Tuesday</string>
+    <string name="wednesday_cb_text">Wednesday</string>
+    <string name="thursday_cb_text">Thursday</string>
+    <string name="friday_cb_text">Friday</string>
+    <string name="saturday_cb_text">Saturday</string>
+    <string name="setTime">Set Alarm Time</string>
+    <string name="alarmToggle_text">Alarm</string>
+    <string name="sunday_cb_text">Sunday</string>
+    <string name="ALARM_EXECUTE_INTENT">ACTION_EXECUTE_ALARM</string>
+
+</resources>

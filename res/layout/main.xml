@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll_view"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/hello" />
+
+        <Button
+            android:id="@+id/setTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/setTime" />
+
+        <TextView
+            android:id="@+id/alarmSetFor_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No Time set"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <CheckBox
+            android:id="@+id/monday_cb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/monday_cb_text" />
+
+        <CheckBox
+            android:id="@+id/tuesday_cb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tuesday_cb_text" />
+
+        <CheckBox
+            android:id="@+id/wednesday_cb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wednesday_cb_text" />
+
+        <CheckBox
+            android:id="@+id/thursday_cb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/thursday_cb_text" />
+
+        <CheckBox
+            android:id="@+id/friday_cb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/friday_cb_text" />
+
+        <CheckBox
+            android:id="@+id/saturday_cb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/saturday_cb_text" />
+
+        <CheckBox
+            android:id="@+id/sunday_cb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sunday_cb_text" />
+
+        <ToggleButton
+            android:id="@+id/setAlarm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/alarmToggle_text" />
+    </LinearLayout>
+
+</ScrollView>
