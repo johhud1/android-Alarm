@@ -24,7 +24,7 @@
             android:id="@+id/alarmSetFor_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No Time set"
+            android:saveEnabled="True"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <CheckBox

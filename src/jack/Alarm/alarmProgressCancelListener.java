@@ -13,7 +13,7 @@ public class alarmProgressCancelListener implements OnCancelListener {
 
     @Override
     public void onCancel(DialogInterface dialog) {
-        // TODO Auto-generated method stub
+
         activity.stopSpeaking();
     }
 

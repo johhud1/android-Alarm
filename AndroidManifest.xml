@@ -17,7 +17,7 @@
         <activity
             android:name=".JackAlarmActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTask" >
+            android:launchMode="singleInstance" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,6 +30,15 @@
             </intent-filter>
 
         </activity>
+        <activity
+            android:name="PrefActivity"
+            android:label="@string/pref_label"
+         ></activity>
+        <service
+            android:name="alarmListenService"
+            android:description="@string/alarmListenServiceDescription">
+        </service>
+
     </application>
 
 </manifest>
