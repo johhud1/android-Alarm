@@ -16,7 +16,6 @@ public class PrefActivity extends Activity {
 
         nameText  = (EditText) findViewById(R.id.prefs_name_EditText);
         nameText.setText(prefs.getString(LFnC.KeyUserName, ""));
-
     }
 
     public void onDestroy(){

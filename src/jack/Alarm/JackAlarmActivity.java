@@ -1,5 +1,4 @@
 package jack.Alarm;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,18 +44,16 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-
-
 public class JackAlarmActivity extends Activity implements OnInitListener,
     OnUtteranceCompletedListener {
     private String tag = "JackAlarmActivity";
-    private String intent_action_alarm;
+    private String intent_action_ALARM_EXECUTE;
     private final int MY_DATA_CHECK_CODE = 99;
     private final int TIME_DIALOG_ID = 0;
     private final int ALARM_NOW_ID = 1;
     private Activity activity = this;
 
-    public WakeLock mWakeLock;
+    //public WakeLock mWakeLock;
 
     private SharedPreferences prefs;
     private alarmReciever mAlarmReciever;
@@ -96,7 +93,7 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
         hours = prefs.getInt(LFnC.KeyHoursVar, 0);
         minutes = prefs.getInt(LFnC.KeyMinutesVar, 0);
 
-        intent_action_alarm = getString(R.string.ALARM_EXECUTE_INTENT);
+        intent_action_ALARM_EXECUTE = getString(R.string.ALARM_EXECUTE_INTENT);
         alarmSetFor_tv = (TextView) findViewById(R.id.alarmSetFor_tv);
         setTime(hours, minutes);
 
@@ -111,7 +108,7 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
         mSetAlarmBut.setChecked(prefs.getBoolean(LFnC.KeyAlarmSetToggled, false));
 
         IntentFilter IF = new IntentFilter();
-        IF.addAction(intent_action_alarm);
+        IF.addAction(intent_action_ALARM_EXECUTE);
         mAlarmReciever = new alarmReciever();
         registerReceiver(mAlarmReciever, IF);
 
@@ -128,16 +125,16 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
     public void onResume() {
         Log.d(tag, "onResume");
         super.onResume();
-
-        PowerManager pwm = (PowerManager) getSystemService(POWER_SERVICE);
-        mWakeLock =
-            pwm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
-                            | PowerManager.ON_AFTER_RELEASE, "alarm wake lock");
-        if(getIntent().getAction().equals(intent_action_alarm)){
+        if (getIntent().getAction().equals(intent_action_ALARM_EXECUTE)) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
                                  WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-            mWakeLock.acquire();
         }
+        registerReceiver(mAlarmReciever, new IntentFilter(getString(R.string.ALARM_EXECUTE_INTENT)));
+//        PowerManager pwm = (PowerManager) getSystemService(POWER_SERVICE);
+//        mWakeLock =
+//            pwm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
+//                            | PowerManager.ON_AFTER_RELEASE, "alarm wake lock");
+
         mSetAlarmBut.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
             @Override
@@ -184,9 +181,17 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
 
     public void onNewIntent(Intent intent) {
         Log.d(tag, "onNewIntent");
-//        if (intent.getAction().equals(intent_action_alarm)) {
-//            startAlarming();
-//        }
+
+        if (intent.getAction().equals(intent_action_ALARM_EXECUTE)) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+            if(mTts != null){
+                startAlarming();
+            }
+            else{
+                mTts = new TextToSpeech(this, this);
+            }
+        }
     }
 
 
@@ -208,10 +213,10 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
 
 
     private PendingIntent createAlarmPendingIntent() {
-        Intent rcvIntent = new Intent(this, JackAlarmActivity.class);
-        rcvIntent.setAction(intent_action_alarm);
-        return PendingIntent.getActivity(this, 0, rcvIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        //return PendingIntent.getBroadcast(this, 0, rcvIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        Intent rcvIntent = new Intent(this, alarmReciever.class);
+        rcvIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        rcvIntent.setAction(intent_action_ALARM_EXECUTE);
+        return PendingIntent.getBroadcast(this, 0, rcvIntent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
 
@@ -318,7 +323,7 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
     public void onInit(int status) {
         Log.d(tag, "onInit");
         mTts.setLanguage(Locale.US);
-        if(getIntent().getAction().equals(intent_action_alarm)){
+        if(getIntent().getAction().equals(intent_action_ALARM_EXECUTE)){
             startAlarming();
         }
     }
@@ -342,9 +347,8 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
         Log.d(tag, "in onUtteranceCompleted id " + uttId + " . Should be dismissing dialog");
         dismissDialog(ALARM_NOW_ID);
         setAlarm();
-        if(mWakeLock.isHeld()){
-            mWakeLock.release();
-        }
+        getIntent().setAction("android.intent.action.MAIN");
+        AlarmWakeLock.releaseLock();
     }
 
 

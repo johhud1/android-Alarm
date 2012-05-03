@@ -34,6 +34,8 @@
             android:name="PrefActivity"
             android:label="@string/pref_label"
          ></activity>
+        <receiver android:name=".alarmReciever">
+        </receiver>
         <service
             android:name="alarmListenService"
             android:description="@string/alarmListenServiceDescription">

@@ -16,9 +16,10 @@ public class alarmReciever extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(tag, "onRecieve");
-        ((JackAlarmActivity)context).mWakeLock.acquire();
-        ((JackAlarmActivity)context).getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                                                          WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        //(context.getApplicationContext()).mWakeLock.acquire();
+        //((JackAlarmActivity)context).getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+        //                                                  WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        AlarmWakeLock.acquireLock(context);
         String intent_alarm_action = context.getString(R.string.ALARM_EXECUTE_INTENT);
         Intent alarm = new Intent(intent_alarm_action).setClass(context, JackAlarmActivity.class);
         alarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
