@@ -19,5 +19,7 @@
     <string name="pref_label">Preferences</string>
     <string name="prefs_name_hint">Your Name</string>
     <string name="alarmListenServiceDescription">background service that listens for the \'alarm\' intent and activates the main activity when it recieves it</string>
+    <string name="GET_WEATHER_ACTION">get_weather_service_action</string>
+    <string name="weatherServiceDescription">this service gets the weather from weather.gov based on your location, and proceses it into a nice format</string>
 
 </resources>
