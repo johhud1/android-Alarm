@@ -23,16 +23,26 @@ import alarm.jack.LFnC;
 import android.util.Log;
 import android.util.Pair;
 
+/*
+ *
+ */
 public class XmlDOMParser{
 
     private static String tag = "XmlDOMParser";
     private InputStream mIs;
 
+    /*
+     * class constructor, idk why I made this a class =/
+     * @param   is  an InputStream that the xmlDOMParser will parse
+     */
     public XmlDOMParser(InputStream is){
         Log.d(tag, "constructor: InputStream("+is.toString()+")");
         mIs = is;
     }
 
+    /*inspects the xml file and parses for my Weather speaking alarm clock
+    @return     returns a hashmap with the key's being the type of weather data, and values of an arraylist containing pair<timeRange, weatherInfo>
+    */
     public HashMap<String, ArrayList<Pair<TimeRange, Integer>>> Parse() throws SAXException, IOException{
         Log.d(tag, "Parse");
         HashMap<String, ArrayList<Pair<TimeRange, Integer>>> retMap = new HashMap<String, ArrayList<Pair<TimeRange, Integer>>>();
@@ -71,17 +81,12 @@ public class XmlDOMParser{
                             timeRange.setEndDate(date);
                         }
                     }
-                    else{
-                        Log.d(tag, "UHOH, error parsing time");
-                    }
                     times.add(timeRange);
 
 
                 } catch (DOMException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (ParseException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
