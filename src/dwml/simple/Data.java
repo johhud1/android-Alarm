@@ -10,7 +10,7 @@ import org.simpleframework.xml.Root;
 public class Data {
 
     @ElementList(inline=true, name="time-layout")
-    public List<TimeLayout> timeLayout;
+    public List<TimeLayout> timeLayouts;
 
     @Element(name="parameters")
     public Parameter parameter;

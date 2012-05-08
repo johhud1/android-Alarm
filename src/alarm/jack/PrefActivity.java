@@ -10,6 +10,8 @@ import android.widget.EditText;
 public class PrefActivity extends Activity {
     private EditText nameText;
 
+    //TODO: add preferences for what weather, and what range of forecast you want.
+    //TODO: add google calender integration, option for google cal integration goes here.
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.prefs);

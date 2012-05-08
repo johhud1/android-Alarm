@@ -24,6 +24,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.xml.sax.SAXException;
 
+import dwml.simple.Dwml;
+import dwml.simple.Temperature;
+import dwml.simple.TimeLayout;
+
 import alarm.weatherHandler.TimeRange;
 import alarm.weatherHandler.XmlDOMParser;
 import android.app.IntentService;
@@ -49,12 +53,12 @@ public class WeatherAndCalService extends IntentService {
         Log.d(tag, "onHandleIntent");
         mLocationManager = (LocationManager)getSystemService(LOCATION_SERVICE);
         mLoc = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        HashMap<String, ArrayList<Pair<TimeRange, Integer>>> weatherMap = new HashMap<String, ArrayList<Pair<TimeRange, Integer>>>();
+
         String weatherString = null;
         if(intent.getAction().equals(getString(R.string.GET_WEATHER_ACTION))){
             try {
-                weatherMap = getTodaysWeather();
-                weatherString = createWeatherString(weatherMap);
+                Dwml dwml = getTodaysWeather();
+                weatherString = createWeatherString(dwml);
             } catch (ClientProtocolException e) {
                 e.printStackTrace();
             } catch (URISyntaxException e) {
@@ -68,7 +72,7 @@ public class WeatherAndCalService extends IntentService {
         stopSelf();
     }
 
-    private HashMap<String, ArrayList<Pair<TimeRange, Integer>>> getTodaysWeather() throws URISyntaxException, ClientProtocolException, IOException{
+    private Dwml getTodaysWeather() throws URISyntaxException, ClientProtocolException, IOException{
         //TODO: handle weather stuff better
         ArrayList<BasicNameValuePair> weatherParams = new ArrayList<BasicNameValuePair>();
         weatherParams.add(new BasicNameValuePair("mint", "mint"));
@@ -91,13 +95,13 @@ public class WeatherAndCalService extends IntentService {
         Log.d(tag, "weatherURI: "+httpget.getURI());
         HttpResponse resp =  httpc.execute(httpget);
         XmlDOMParser parser = new XmlDOMParser(resp.getEntity().getContent());
-        HashMap<String, ArrayList<Pair<TimeRange, Integer>>> xmlParse = new HashMap<String, ArrayList<Pair<TimeRange, Integer>>>();
+        Dwml dwml= null;
         try {
-            xmlParse = parser.Parse();
+            dwml = parser.Parse();
         } catch (SAXException e) {
             e.printStackTrace();
         }
-        return xmlParse;
+        return dwml;
     }
 
     private void getTodaysCalender(){
@@ -121,30 +125,48 @@ public class WeatherAndCalService extends IntentService {
     /*
      * create a string that will be included in the intent used to launch the alarm activity and spoken to the user
      * @params weatherMap   A hashMap of the weather info, to be parsed and transformed into an appropriate string for speech synthesis
-     * @return              A string desciribing the weather that will be spoken to the user
+     * @return              A string describing the weather that will be spoken to the user
      */
-    private String createWeatherString(HashMap<String, ArrayList<Pair<TimeRange, Integer>>> weatherMap){
+    private String createWeatherString(Dwml dwml){
         //TODO: create a string to be spoken.DOne?. Could make it much it better though.
         Log.d(tag, "createWeatherString");
-        StringBuilder retString = new StringBuilder();
-        Iterator<String> keyIterator = weatherMap.keySet().iterator();
-        while(keyIterator.hasNext()){
-            String weatherType = keyIterator.next();
-            if(weatherType.compareTo(LFnC.myMap_hourly_temp_key)==0){
-                Formatter formatter = new Formatter(retString);
-                ArrayList<Pair<TimeRange, Integer>> hourlyTimeTemps = weatherMap.get(weatherType);
-                retString.append(LFnC.speechWeatherIntroString);
-                for(Pair p:hourlyTimeTemps){
-                    int temp = (Integer)p.second;
-                    Date startTime = ((TimeRange)p.first).getStartDate();
-                    Date endTime = ((TimeRange)p.first).getEndDate();
-                    formatter.format(LFnC.speechWeatherTimeRangeTempFormat,
-                                                              startTime, endTime, temp);
+        StringBuilder retString = new StringBuilder(LFnC.speechWeatherIntroString);
+        Formatter formatter = new Formatter(retString);
+        List<TimeLayout> timelayouts = dwml.data.timeLayouts;
+        List<Temperature> temperatures = dwml.data.parameter.temperatures;
+        for(TimeLayout tl:timelayouts){
+            for(Temperature tmp:temperatures){
+                if(tl.layout_key.equals(tmp.time_layout_key)){
+                    retString.append(" "+tmp.type+" ");
+                    for(int i=0; i<tmp.values.size(); i++){
+                        if(tl.end_times!=null)
+                        formatter.format(LFnC.speechWeatherTimeRangeTempFormat, tl.start_times.get(i),
+                                         tl.end_times.get(i), tmp.values.get(i).intValue());
+                        else if(i!=tmp.values.size()-1){
+                            formatter.format(LFnC.speechWeatherTimeRangeTempFormat, tl.start_times.get(i),
+                                            tl.start_times.get(i+1), tmp.values.get(i).intValue());
+                        }
+                    }
                 }
             }
         }
+//        Iterator<String> keyIterator = dwml.keySet().iterator();
+//        while(keyIterator.hasNext()){
+//            String weatherType = keyIterator.next();
+//            if(weatherType.compareTo(LFnC.myMap_hourly_temp_key)==0){
+//                Formatter formatter = new Formatter(retString);
+//                ArrayList<Pair<TimeRange, Integer>> hourlyTimeTemps = dwml.get(weatherType);
+//                retString.append(LFnC.speechWeatherIntroString);
+//                for(Pair p:hourlyTimeTemps){
+//                    int temp = (Integer)p.second;
+//                    Date startTime = ((TimeRange)p.first).getStartDate();
+//                    Date endTime = ((TimeRange)p.first).getEndDate();
+//                    formatter.format(LFnC.speechWeatherTimeRangeTempFormat,
+//                                                              startTime, endTime, temp);
+//                }
+//            }
+//        }
         Log.d(tag, "return weatherString: "+retString.toString());
         return retString.toString();
     }
-
 }

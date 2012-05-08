@@ -26,8 +26,10 @@ public class LFnC {
     public static final String alarm_time_format_main = "HH:mmz";
     //TODO: get these speech format strings right *********
     public static final String speechTheDateIntroFormatString = " the date is %a, %B %e ";
-    public static final String speechWeatherTimeRangeTempFormat = "from %1$tl:%1$tM %1$tp to %2$tl:%2$tM %2$tp, "
-                                +"%2$d degrees %3$s. ";
+    public static final String speechWeatherTimeRangeTempFormat = " from %1$tl:%1$tM %1$tp to %2$tl:%2$tM %2$tp, "
+                                +"%3$d degrees. "; // %3$s - for type maybe,
+//    public static final String speechWeatherTimeTempFormat =" from %1$tl:%1$tM %1$tp to %2$tl:%2$tM %2$tp, "
+//        +"%3$d degrees. "
     public static final String speechWeatherIntroString =
         " the forecast for today is: ";
     //public static final String threeHourTempRecurringString = " from %s to %s, %d degrees fahrenheit. ";

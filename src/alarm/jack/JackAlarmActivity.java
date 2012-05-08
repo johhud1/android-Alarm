@@ -371,7 +371,7 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
         speachParams.put(TextToSpeech.Engine.KEY_PARAM_STREAM,
                          String.valueOf(AudioManager.STREAM_ALARM));
         speachParams.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "alarm speech");
-        mTts.speak("Good Morning" + prefs.getString(LFnC.KeyUserName, "NO USER FOUND")+intent.getStringExtra(LFnC.weatherStringBundleKey),
+        mTts.speak("Good Morning " + prefs.getString(LFnC.KeyUserName, "NO USER FOUND")+intent.getStringExtra(LFnC.weatherStringBundleKey),
                    TextToSpeech.QUEUE_ADD, speachParams);
     }
 
