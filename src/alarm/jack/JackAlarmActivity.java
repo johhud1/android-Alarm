@@ -1,6 +1,7 @@
 package alarm.jack;
 import alarm.jack.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -22,6 +23,7 @@ import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -63,6 +65,7 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
     private LocationManager mLocationManager;
     private alarmReciever mAlarmReciever;
     private AlarmManager mAlarmManager;
+    LocationListener mLocationListener;
     private TextView alarmSetFor_tv;
     private CheckBox[] cbForDays = new CheckBox[7];
     private ToggleButton mSetAlarmBut;
@@ -122,32 +125,31 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
         mTts = new TextToSpeech(this, this);
 
         mLocationManager = (LocationManager)getSystemService(LOCATION_SERVICE);
+        if(mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)==null){
+            Toast.makeText(this, LFnC.network_provider_disabled_toast, Toast.LENGTH_LONG).show();
+            // Define a listener that responds to location updates
+            mLocationListener = new LocationListener() {
+                public void onLocationChanged(Location location) {
+                  // Called when a new location is found by the network location provider.
+                  updateLocationAndUnregister(location);
+                }
+
+                public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+                public void onProviderEnabled(String provider) {}
+
+                public void onProviderDisabled(String provider) {}
+              };
+            // Register the listener with the Location Manager to receive location updates
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocationListener);
+        }
         mAlarmTimePickedListener = new jackAlarmTimePickedListener(this);
     }
-     // Acquire a reference to the system Location Manager
-//        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-//        // Define a listener that responds to location updates
-//        mLocationListener = new LocationListener() {
-//            public void onLocationChanged(Location location) {
-//              // Called when a new location is found by the network location provider.
-//              updateLocationAndUnregister(location);
-//            }
-//
-//            public void onStatusChanged(String provider, int status, Bundle extras) {}
-//
-//            public void onProviderEnabled(String provider) {}
-//
-//            public void onProviderDisabled(String provider) {}
-//          };
-//        // Register the listener with the Location Manager to receive location updates
-//        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocationListener);
-//
-//    }
-//
-//    private void updateLocationAndUnregister(Location location){
-//        mLoc = location;
-//        mLocationManager.removeUpdates(mLocationListener);
-//    }
+
+    private void updateLocationAndUnregister(Location location){
+        mLoc = location;
+        mLocationManager.removeUpdates(mLocationListener);
+    }
 
 
     @Override
@@ -324,7 +326,9 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
     public void setTime(int hour, int minute) {
         hours = hour;
         minutes = minute;
-        alarmSetFor_tv.setText("Alarm time set for " + hour + ":" + minute);
+        //SimpleDateFormat sdf = new SimpleDateFormat(LFnC.alarm_time_format_main);
+        //TODO:fix this dumb setTime crap, should be passed Date class or something, not ints...FORMAT IT
+        alarmSetFor_tv.setText("Alarm set for " + hour + ":" + minute);
     }
 
 

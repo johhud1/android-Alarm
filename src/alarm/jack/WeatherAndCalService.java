@@ -3,14 +3,17 @@ package alarm.jack;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import org.apache.http.HttpHost;
+import javax.xml.bind.JAXBException;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -18,8 +21,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHttpRequest;
-import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicNameValuePair;
 import org.xml.sax.SAXException;
 
@@ -31,6 +32,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.IBinder;
+import android.text.format.Time;
 import android.util.Log;
 import android.util.Pair;
 
@@ -122,16 +124,27 @@ public class WeatherAndCalService extends IntentService {
      * @return              A string desciribing the weather that will be spoken to the user
      */
     private String createWeatherString(HashMap<String, ArrayList<Pair<TimeRange, Integer>>> weatherMap){
-        //TODO: create a string to be spoken
-        String retString = null;
+        //TODO: create a string to be spoken.DOne?. Could make it much it better though.
+        Log.d(tag, "createWeatherString");
+        StringBuilder retString = new StringBuilder();
         Iterator<String> keyIterator = weatherMap.keySet().iterator();
         while(keyIterator.hasNext()){
             String weatherType = keyIterator.next();
             if(weatherType.compareTo(LFnC.myMap_hourly_temp_key)==0){
-                //retString =
+                Formatter formatter = new Formatter(retString);
+                ArrayList<Pair<TimeRange, Integer>> hourlyTimeTemps = weatherMap.get(weatherType);
+                retString.append(LFnC.speechWeatherIntroString);
+                for(Pair p:hourlyTimeTemps){
+                    int temp = (Integer)p.second;
+                    Date startTime = ((TimeRange)p.first).getStartDate();
+                    Date endTime = ((TimeRange)p.first).getEndDate();
+                    formatter.format(LFnC.speechWeatherTimeRangeTempFormat,
+                                                              startTime, endTime, temp);
+                }
             }
         }
-        return retString;
+        Log.d(tag, "return weatherString: "+retString.toString());
+        return retString.toString();
     }
 
 }

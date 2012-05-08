@@ -7,17 +7,26 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.strategy.Strategy;
+import org.simpleframework.xml.transform.RegistryMatcher;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import dwml.simple.Dwml;
+import dwml.simple.myXMLDate;
 
 import alarm.jack.LFnC;
 import android.util.Log;
@@ -47,12 +56,21 @@ public class XmlDOMParser{
         Log.d(tag, "Parse");
         HashMap<String, ArrayList<Pair<TimeRange, Integer>>> retMap = new HashMap<String, ArrayList<Pair<TimeRange, Integer>>>();
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        RegistryMatcher rm = new RegistryMatcher();
+        rm.bind(Date.class, myXMLDate.class);
+        Serializer serializer = new Persister(rm);
+
         DocumentBuilder db = null;
+        Dwml mDwml = null;
         try{
+            mDwml = serializer.read(Dwml.class, mIs);
             db = dbf.newDocumentBuilder();
         }
         catch(ParserConfigurationException e){
             Log.d(tag, e.toString());
+        }catch (Exception e1) {
+            e1.printStackTrace();
         }
 
         Document doc =null;
@@ -67,22 +85,21 @@ public class XmlDOMParser{
             NodeList timeLayoutChildren = timeLayouts.item(i).getChildNodes();
             Element layoutKey = (Element)timeLayoutChildren.item(1);
             ArrayList<TimeRange> times = new ArrayList<TimeRange>();
-            SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-d'T'HH:mm:ss'Z'");
+            SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-d'T'HH:mm:ssz");
             for(int k=2; k<timeLayoutChildren.getLength(); k++){
                 if(timeLayoutChildren.item(k).getNodeType()==Node.ELEMENT_NODE)
                 try {
                     TimeRange timeRange = new TimeRange();
-                    if(timeLayoutChildren.item(k).getNodeName()==LFnC.startTime_nodeName){
+                    if(timeLayoutChildren.item(k).getNodeName().equals(LFnC.startTime_nodeName)){
                         Date date = parser.parse(timeLayoutChildren.item(k).getTextContent());
                         timeRange.setStartDate(date);
                         k=k+2;
-                        if(timeLayoutChildren.item(k).getNodeName()==LFnC.endTime_nodeName){
+                        if(timeLayoutChildren.item(k).getNodeName().equals(LFnC.endTime_nodeName)){
                             date = parser.parse(timeLayoutChildren.item(k).getTextContent());
                             timeRange.setEndDate(date);
                         }
+                        times.add(timeRange);
                     }
-                    times.add(timeRange);
-
 
                 } catch (DOMException e) {
                     e.printStackTrace();
@@ -108,8 +125,8 @@ public class XmlDOMParser{
                 for(int k=0; k<hourlyTempNL.getLength();k++){
                     int l=0;
                     if(hourlyTempNL.item(k).getNodeName().compareTo(LFnC.temp_value_tag)==0){
-                        String nv = hourlyTempNL.item(k).getNodeValue();
-                        timeTempPairList.add(new Pair<TimeRange, Integer>(tempTimeRange.get(l), Integer.getInteger(nv)));
+                        String nv = hourlyTempNL.item(k).getFirstChild().getNodeValue();
+                        timeTempPairList.add(new Pair<TimeRange, Integer>(tempTimeRange.get(k), Integer.getInteger(nv)));
                     }
                 }
                 retMap.put(LFnC.myMap_hourly_temp_key, timeTempPairList);
