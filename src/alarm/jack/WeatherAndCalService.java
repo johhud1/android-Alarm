@@ -137,7 +137,7 @@ public class WeatherAndCalService extends IntentService {
         for(TimeLayout tl:timelayouts){
             for(Temperature tmp:temperatures){
                 if(tl.layout_key.equals(tmp.time_layout_key)){
-                    retString.append(" "+tmp.type+" ");
+                    retString.append(" "+tmp.type+": ");
                     for(int i=0; i<tmp.values.size(); i++){
                         if(tl.end_times!=null)
                         formatter.format(LFnC.speechWeatherTimeRangeTempFormat, tl.start_times.get(i),
