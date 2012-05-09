@@ -6,12 +6,14 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
-@Root(strict=false)
+
+
+@Root(strict = false)
 public class Data {
 
-    @ElementList(inline=true, name="time-layout")
+    @ElementList(inline = true, name = "time-layout")
     public List<TimeLayout> timeLayouts;
 
-    @Element(name="parameters")
+    @Element(name = "parameters")
     public Parameter parameter;
 }

@@ -1,7 +1,5 @@
 package alarm.jack;
-import alarm.jack.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,8 +12,6 @@ import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
-import android.app.SearchManager.OnCancelListener;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -23,13 +19,9 @@ import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Parcel;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
-import android.sax.StartElementListener;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
@@ -39,18 +31,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewDebug.FlagToString;
-import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+
 
 public class JackAlarmActivity extends Activity implements OnInitListener,
     OnUtteranceCompletedListener {
@@ -98,7 +88,7 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
             cbForDays[i].setChecked(prefs.getBoolean(LFnC.KeyCBBoolForDay + i, false));
             cbForDays[i].setOnClickListener(cbClickListener);
         }
-        mAlarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         hours = prefs.getInt(LFnC.KeyHoursVar, 0);
         minutes = prefs.getInt(LFnC.KeyMinutesVar, 0);
@@ -124,29 +114,40 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
 
         mTts = new TextToSpeech(this, this);
 
-        mLocationManager = (LocationManager)getSystemService(LOCATION_SERVICE);
-        if(mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)==null){
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) == null) {
             Toast.makeText(this, LFnC.network_provider_disabled_toast, Toast.LENGTH_LONG).show();
             // Define a listener that responds to location updates
             mLocationListener = new LocationListener() {
+                @Override
                 public void onLocationChanged(Location location) {
-                  // Called when a new location is found by the network location provider.
-                  updateLocationAndUnregister(location);
+                    // Called when a new location is found by the network
+                    // location provider.
+                    updateLocationAndUnregister(location);
                 }
 
+
+                @Override
                 public void onStatusChanged(String provider, int status, Bundle extras) {}
 
+
+                @Override
                 public void onProviderEnabled(String provider) {}
 
+
+                @Override
                 public void onProviderDisabled(String provider) {}
-              };
-            // Register the listener with the Location Manager to receive location updates
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocationListener);
+            };
+            // Register the listener with the Location Manager to receive
+            // location updates
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,
+                                                    mLocationListener);
         }
         mAlarmTimePickedListener = new jackAlarmTimePickedListener(this);
     }
 
-    private void updateLocationAndUnregister(Location location){
+
+    private void updateLocationAndUnregister(Location location) {
         mLoc = location;
         mLocationManager.removeUpdates(mLocationListener);
     }
@@ -160,8 +161,8 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
         mLoc = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
         if (getIntent().getAction().equals(intent_action_ALARM_EXECUTE)) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                     | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         }
         registerReceiver(mAlarmReciever, new IntentFilter(getString(R.string.ALARM_EXECUTE_INTENT)));
 
@@ -209,17 +210,17 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
     }
 
 
+    @Override
     public void onNewIntent(Intent intent) {
         Log.d(tag, "onNewIntent");
 
         if (intent.getAction().equals(intent_action_ALARM_EXECUTE)) {
             String weatherString = intent.getStringExtra(LFnC.weatherStringBundleKey);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-            if(mTts != null){
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                     | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+            if (mTts != null) {
                 startAlarming(intent);
-            }
-            else{
+            } else {
                 mTts = new TextToSpeech(this, this);
             }
         }
@@ -279,7 +280,9 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
                 test.getTime();
                 if (now.compareTo(test) < 0) {
                     long thisTime = test.getTimeInMillis();
-                    if (thisTime < leastTime) leastTime = thisTime;
+                    if (thisTime < leastTime) {
+                        leastTime = thisTime;
+                    }
                 }
             }
             if (leastTime == Long.MAX_VALUE) {
@@ -296,12 +299,14 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
 
     public void unSetAlarm() {
         Log.d(tag, "unsetting the alarm, should remove all intents, and never go off");
-        // toast for alarm being unset should be done somewhere else, cause otherwise this would be
+        // toast for alarm being unset should be done somewhere else, cause
+        // otherwise this would be
         // going off all the time
         mAlarmManager.cancel(createAlarmPendingIntent());
     }
 
 
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
         case MY_DATA_CHECK_CODE:
@@ -326,12 +331,15 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
     public void setTime(int hour, int minute) {
         hours = hour;
         minutes = minute;
-        //SimpleDateFormat sdf = new SimpleDateFormat(LFnC.alarm_time_format_main);
-        //TODO:fix this dumb setTime crap, should be passed Date class or something, not ints...FORMAT IT
+        // SimpleDateFormat sdf = new
+        // SimpleDateFormat(LFnC.alarm_time_format_main);
+        // TODO:fix this dumb setTime crap, should be passed Date class or
+        // something, not ints...FORMAT IT
         alarmSetFor_tv.setText("Alarm set for " + hour + ":" + minute);
     }
 
 
+    @Override
     protected Dialog onCreateDialog(int id) {
         Date now = new Date();
         switch (id) {
@@ -356,7 +364,7 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
     public void onInit(int status) {
         Log.d(tag, "onInit");
         mTts.setLanguage(Locale.US);
-        if(getIntent().getAction().equals(intent_action_ALARM_EXECUTE)){
+        if (getIntent().getAction().equals(intent_action_ALARM_EXECUTE)) {
             startAlarming(getIntent());
         }
     }
@@ -371,11 +379,13 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
         speachParams.put(TextToSpeech.Engine.KEY_PARAM_STREAM,
                          String.valueOf(AudioManager.STREAM_ALARM));
         speachParams.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "alarm speech");
-        mTts.speak("Good Morning " + prefs.getString(LFnC.KeyUserName, "NO USER FOUND")+intent.getStringExtra(LFnC.weatherStringBundleKey),
+        mTts.speak("Good Morning " + prefs.getString(LFnC.KeyUserName, "NO USER FOUND")
+                       + intent.getStringExtra(LFnC.weatherStringBundleKey),
                    TextToSpeech.QUEUE_ADD, speachParams);
     }
 
 
+    @Override
     public void onUtteranceCompleted(String uttId) {
         Log.d(tag, "in onUtteranceCompleted id " + uttId + " . Should be dismissing dialog");
         dismissDialog(ALARM_NOW_ID);
@@ -391,6 +401,8 @@ public class JackAlarmActivity extends Activity implements OnInitListener,
         dismissDialog(ALARM_NOW_ID);
     }
 
+
+    @Override
     public void onDestroy() {
         Log.d(tag, "onDestroy");
         if (mTts != null) {

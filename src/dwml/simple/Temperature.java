@@ -6,6 +6,8 @@ import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 
+
+
 @Element
 public class Temperature {
     @Attribute
@@ -13,13 +15,13 @@ public class Temperature {
     @Attribute
     public String units;
 
-    @Attribute(name="time-layout")
+    @Attribute(name = "time-layout")
     public String time_layout_key;
 
     @Element
     public String name;
 
-    @ElementList(entry="value", inline=true)
+    @ElementList(entry = "value", inline = true)
     public List<Integer> values;
 
 }

@@ -1,8 +1,12 @@
 package dwml.simple;
 
-import org.simpleframework.xml.*;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
-@Root(strict=false)
+
+
+@Root(strict = false)
 public class Dwml {
 
     @Attribute
@@ -11,10 +15,10 @@ public class Dwml {
     @Attribute
     public double version;
 
-    //@Element
-    //public Head head;
+    // @Element
+    // public Head head;
 
-    @Element(name="data")
+    @Element(name = "data")
     public Data data;
 
 }
